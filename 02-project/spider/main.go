@@ -2,32 +2,49 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"io"
+	"io/ioutil"
 	"net/http"
-	"github.com/PuerkitoBio/goquery"
 )
 
-func BaiduHotSearch() {
-  res, err := http.Get("http://www.baidu.com")
-  if err != nil {
-    log.Fatal(err)
-  }
-  defer res.Body.Close()
-  if res.StatusCode != 200 {
-    log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
-  }
-
-  doc, err := goquery.NewDocumentFromReader(res.Body)
-  if err != nil {
-    log.Fatal(err)
-  }
-
-  doc.Find(".s-hotsearch-content .hotsearch-item").Each(func(i int, s *goquery.Selection) {
-    content := s.Find(".title-content-title").Text()
-    fmt.Printf("%d: %s\n", i, content)
-  })
-}
-
 func main() {
-  BaiduHotSearch()
+
+	//req, err := http.NewRequest("GET", "https://www.cnblogs.com/", nil)
+	//req, err := http.NewRequest("GET", "https://book.douban.com/", nil)
+	req, err := http.NewRequest("GET", "https://chinanews.com/", nil)
+	if err != nil {
+		panic(err)
+	}
+	header := map[string]string{
+		"Host":                      "movie.douban.com",
+		"Connection":                "keep-alive",
+		"Cache-Control":             "max-age=0",
+		"Upgrade-Insecure-Requests": "1",
+		"User-Agent":                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36",
+		"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+		"Referer":                   "https://movie.douban.com/top250",
+	}
+	for key, value := range header {
+		req.Header.Add(key, value)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Error: %v\n", resp.StatusCode)
+	}
+
+	result, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%s", result)
 }
