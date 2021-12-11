@@ -11,13 +11,25 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 func Fetch(url string) ([]byte, error) {
+	client := &http.Client{
+		Timeout: 20 * time.Second,
+	}
+	//https://album.zhenai.com/u/1164458612
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authority", "www.zhenai.com")
+	req.Header.Set("Cache-Control", "max-age=0")
+	req.Header.Set("Sec-Ch-Ua", "^^")
+
+	resp, err := client.Do(req)
+
 	//resp, err := http.Get("https://www.zhenai.com/zhenghun")
 	//resp, err := http.Get("https://www.zhenai.com/zhenghun/wuhan")
 	//resp, err := http.Get("https://pvp.qq.com/")
-	resp, err := http.Get(url)
+	//resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -31,14 +43,15 @@ func Fetch(url string) ([]byte, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Wrong StatusCode:%d", resp.StatusCode)
 	}
-	e := determineEncoding(resp.Body)
+	bodyReader := bufio.NewReader(resp.Body)
+	e := determineEncoding(bodyReader)
 	fmt.Print(e)
-	utf8Reader := transform.NewReader(resp.Body, e.NewEncoder())
+	utf8Reader := transform.NewReader(bodyReader, e.NewEncoder())
 	return ioutil.ReadAll(utf8Reader)
-
 }
-func determineEncoding(r io.Reader) encoding.Encoding {
-	bytes, err := bufio.NewReader(r).Peek(1024)
+
+func determineEncoding(r *bufio.Reader) encoding.Encoding {
+	bytes, err := r.Peek(1024)
 	if err != nil {
 		log.Printf("Fetch error: %v", err)
 		return unicode.UTF8

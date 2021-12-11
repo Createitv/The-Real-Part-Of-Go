@@ -2,11 +2,15 @@ package main
 
 import (
 	"The-Real-Part-Of-Go/02-project/crawler/engine"
+	"The-Real-Part-Of-Go/02-project/crawler/scheduler"
 	"The-Real-Part-Of-Go/02-project/crawler/zhenai/parser"
 )
 
 func main() {
-	engine.Run(engine.Request{
+	e := engine.ConcurrrentEngine{
+		Scheduler: &scheduler.SimpleScheduler{},
+	}
+	e.Run(engine.Request{
 		Url:        "https://www.zhenai.com/zhenghun",
 		ParserFunc: parser.ParserCityList,
 	})
