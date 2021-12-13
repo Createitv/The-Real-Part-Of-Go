@@ -2,16 +2,16 @@ package main
 
 import "fmt"
 
-type Student struct {
+type Student2 struct {
 	name string
 	id   int
 }
 
 func main() {
 	i := make([]interface{}, 3)
-	i[0] = 1                    //int
-	i[1] = "hello go"           //string
-	i[2] = Student{"mike", 666} //Student
+	i[0] = 1                     //int
+	i[1] = "hello go"            //string
+	i[2] = Student2{"mike", 666} //Student
 
 	//类型查询，类型断言
 	for index, data := range i {
@@ -20,7 +20,7 @@ func main() {
 			fmt.Printf("x[%d] 类型为int, 内容为%d\n", index, value)
 		case string:
 			fmt.Printf("x[%d] 类型为string, 内容为%s\n", index, value)
-		case Student:
+		case Student2:
 			fmt.Printf("x[%d] 类型为Student, 内容为name = %s, id = %d\n", index, value.name, value.id)
 		}
 
