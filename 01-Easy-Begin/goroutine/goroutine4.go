@@ -40,6 +40,7 @@ func Fetch(url string) {
 		if err != nil {
 			log.Panic(err)
 		}
+
 		fmt.Println(string(bodyBytes))
 	}
 	// return res, err
