@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -40,8 +41,17 @@ func Fetch(url string) {
 		if err != nil {
 			log.Panic(err)
 		}
-
-		fmt.Println(string(bodyBytes))
+		var data map[string]interface{}
+		err = json.Unmarshal([]byte(bodyBytes), &data)
+		if err != nil {
+			log.Println(err)
+		}
+		err := ioutil.WriteFile("books", data, 0644)
+		if err != nil {
+			panic(err)
+		}
+		//fmt.Println(string(bodyBytes))
+		log.Println(data)
 	}
 	// return res, err
 }

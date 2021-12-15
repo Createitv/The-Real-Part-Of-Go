@@ -8,8 +8,8 @@ import (
 // 并发锁，内存共享
 
 var (
-	x  int
-	wg sync.WaitGroup
+	x    int
+	wg   sync.WaitGroup
 	lock sync.Mutex
 )
 
